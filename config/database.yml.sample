@@ -1,0 +1,22 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+development:
+  <<: *default
+  database: flight_booking_development
+  username:
+  password: 
+
+test:
+  <<: *default
+  database: flight_booking_test
+  username:
+  password:
+
+production:
+  <<: *default
+  database: flight_booking_production
+  username: flight_booking
+  password: <%= ENV['FLIGHT_BOOKING_DATABASE_PASSWORD'] %>
