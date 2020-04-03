@@ -2,7 +2,7 @@ import React from 'react';
 import TextField from '../shared/TextField';
 import SubmitButton from '../shared/SubmitButton';
 import SelectField from '../shared/SelectField';
-import validateFlightInput from '../../validators/flightValidator';
+// import validateFlightInput from '../../validators/flightValidator';
 import './NewFlight.css';
 import DateField from '../shared/DateField';
 
