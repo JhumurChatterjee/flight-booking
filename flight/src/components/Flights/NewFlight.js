@@ -12,7 +12,17 @@ export default class NewFlight extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      flights: []
+      name: '',
+      price: '',
+      departureTime: '',
+      arrivalTime: '',
+      departureAirport: null,
+      arrivalAirport: null,
+      errors: {},
+      startDate: '',
+      endDate: '',
+      airportOptions: [],
+      isLoading: false
     }
   }
 
@@ -37,9 +47,12 @@ export default class NewFlight extends React.Component {
     this.setState({ airportOptions });
   }
 
+  onChange = (e) => {
+    this.setState({ [e.target.name]: e.target.value });
+  }
+
   createFlight = (e) => {
-    console.log(e);
-    axios.post('/api/v1/flights', {flight: {price: 23}})
+    axios.post('/api/v1/flights', {flight: {name: this.state.name, price: this.state.price, departure_time: this.state.departureTime, arrival_time: this.state.arrivalTime, departure_airport: this.state.departureAirport, arrival_airport: this.state.arrivalAirport, start_date: this.state.startDate, end_date: this.state.endDate}} )
     .then(response => {
       const flights = update(this.state.flights, {
         $splice: [[0, 0, response.data]]
@@ -47,6 +60,7 @@ export default class NewFlight extends React.Component {
       this.setState({
         flights: flights
       })
+      console.log(response.data);
     })
     .catch(error => console.log(error))
 }
@@ -57,31 +71,21 @@ export default class NewFlight extends React.Component {
     return true;
   }
 
-  // onSubmit = (e) => {
-  //   e.preventDefault();
+  // storeFlightData = () => {
+  //   const { name, departureAirport, arrivalAirport, arrivalTime, departureTime, startDate, endDate, price } = this.state;
+  //   let flights = JSON.parse(localStorage.getItem('Flights') || '[]');
+  //   let flight = {};
   //
-  //   if (this.isValid()) {
-  //     this.setState({ errors: {}, isLoading: true });
-  //     this.storeFlightData();
-  //     this.props.history.push('/admin/flights');
+  //   if (flights.length === 0) {
+  //     flight = { id: 1, name: name, departureAirport: departureAirport, arrivalAirport: arrivalAirport, arrivalTime: arrivalTime, departureTime: departureTime, price: price, startDate: startDate, endDate: endDate };
+  //   } else {
+  //     let lastFlight = flights[flights.length - 1]
+  //     flight = { id: lastFlight.id + 1, name: name, departureAirport: departureAirport, arrivalAirport: arrivalAirport, arrivalTime: arrivalTime, departureTime: departureTime, price: price, startDate: startDate, endDate: endDate }
   //   }
+  //
+  //   flights = [...flights, flight]
+  //   localStorage.setItem('Flights', JSON.stringify(flights))
   // }
-
-  storeFlightData = () => {
-    const { name, departureAirport, arrivalAirport, arrivalTime, departureTime, startDate, endDate, price } = this.state;
-    let flights = JSON.parse(localStorage.getItem('Flights') || '[]');
-    let flight = {};
-
-    if (flights.length === 0) {
-      flight = { id: 1, name: name, departureAirport: departureAirport, arrivalAirport: arrivalAirport, arrivalTime: arrivalTime, departureTime: departureTime, price: price, startDate: startDate, endDate: endDate };
-    } else {
-      let lastFlight = flights[flights.length - 1]
-      flight = { id: lastFlight.id + 1, name: name, departureAirport: departureAirport, arrivalAirport: arrivalAirport, arrivalTime: arrivalTime, departureTime: departureTime, price: price, startDate: startDate, endDate: endDate }
-    }
-
-    flights = [...flights, flight]
-    localStorage.setItem('Flights', JSON.stringify(flights))
-  }
 
   render() {
     const { name, arrivalTime, departureTime, price, isLoading, errors, airportOptions, startDate, endDate } = this.state;
@@ -93,10 +97,80 @@ export default class NewFlight extends React.Component {
             <form>
               <h3 className='text-center'>New Flight</h3>
 
+              <TextField
+                label='Name'
+                onChange={this.onChange}
+                value={name}
+                fieldName='name'
+                type='text'
+                autoComplete='off'
+                id='flight_name'
+                autoFocus={true}
+              />
 
               <TextField
+                fieldName='departureAirport'
+                label='Departure Airport'
+                id='departure_airport'
+                onChange={this.onChange}
+                type='text'
+                autoComplete='off'
+              />
 
+              <TextField
+                label='Departure Time'
+                onChange={this.onChange}
+                value={departureTime}
+                fieldName='departureTime'
+                type='time'
+                autoComplete='off'
+                id='flight_departure_time'
+              />
+
+              <TextField
+                fieldName='arrivalAirport'
+                label='Arrival Airport'
+                id='arrival_airport'
+                onChange={this.onChange}
+                type='text'
+                autoComplete='off'
+                options={airportOptions}
+                prompt='-- Select Airport --'
+              />
+
+              <TextField
+                label='Arrival Time'
+                onChange={this.onChange}
+                value={arrivalTime}
+                fieldName='arrivalTime'
+                type='time'
+                autoComplete='off'
+                id='flight_arrival_time'
+              />
+
+              <DateField
+                label='Start Date'
+                onChange={this.onChange}
+                value={startDate}
+                fieldName='startDate'
+                type='date'
+                autoComplete='off'
+                id='flight_start_date'
+              />
+
+              <DateField
+                label='End Date'
+                onChange={this.onChange}
+                value={endDate}
+                fieldName='endDate'
+                type='date'
+                autoComplete='off'
+                id='flight_end_date'
+              />
+
+              <TextField
                 label='Price'
+                onChange={this.onChange}
                 value={price}
                 fieldName='price'
                 type='number'
