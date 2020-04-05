@@ -2,7 +2,7 @@ import React from 'react';
 import TextField from '../shared/TextField';
 import SubmitButton from '../shared/SubmitButton';
 import SelectField from '../shared/SelectField';
-import validateFlightInput from '../../validators/flightValidator';
+// import validateFlightInput from '../../validators/flightValidator';
 import DateField from '../shared/DateField';
 
 export default class EditFlight extends React.Component {
@@ -30,9 +30,9 @@ export default class EditFlight extends React.Component {
   }
 
   isValid = () => {
-    const { errors, isValid } = validateFlightInput(this.state);
-    if (!isValid) this.setState({ errors });
-    return isValid;
+    // const { errors, isValid } = validateFlightInput(this.state);
+    // if (!isValid) this.setState({ errors });
+    return true;
   }
 
   onSubmit = (e) => {

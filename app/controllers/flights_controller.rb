@@ -6,7 +6,7 @@ class FlightsController < ApiController
 
   def create
     @flight = Flight.create!(flight_params)
-    json_response(@flight, :created)
+    render json: @flights
   end
 
   def show
@@ -26,7 +26,7 @@ class FlightsController < ApiController
   private
 
   def flight_params
-    params.permit(:number, :seats)
+    params.require(:flight).permit(:price)
   end
 
   def flight

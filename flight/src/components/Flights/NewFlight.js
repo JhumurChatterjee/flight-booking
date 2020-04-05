@@ -1,4 +1,6 @@
 import React from 'react';
+import axios from 'axios';
+import update from 'immutability-helper';
 import TextField from '../shared/TextField';
 import SubmitButton from '../shared/SubmitButton';
 import SelectField from '../shared/SelectField';
@@ -10,17 +12,7 @@ export default class NewFlight extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      name: '',
-      price: '',
-      departureTime: '',
-      arrivalTime: '',
-      departureAirport: null,
-      arrivalAirport: null,
-      errors: {},
-      startDate: '',
-      endDate: '',
-      airportOptions: [],
-      isLoading: false
+      flights: []
     }
   }
 
@@ -28,15 +20,15 @@ export default class NewFlight extends React.Component {
     let authenticity = localStorage.getItem('Authenticity');
     let admin = localStorage.getItem('Admin');
 
-    if (!authenticity) {
-      this.props.history.push('/signin');
-      return;
-    }
-
-    if(!admin) {
-      this.props.history.push('/');
-      return;
-    }
+    // if (!authenticity) {
+    //   this.props.history.push('/signin');
+    //   return;
+    // }
+    //
+    // if(!admin) {
+    //   this.props.history.push('/');
+    //   return;
+    // }
 
     const airports = JSON.parse(localStorage.getItem('Airports') || '[]');
     const airportOptions = airports.map(airport => {
@@ -45,25 +37,35 @@ export default class NewFlight extends React.Component {
     this.setState({ airportOptions });
   }
 
-  onChange = (e) => {
-    this.setState({ [e.target.name]: e.target.value });
-  }
+  createFlight = (e) => {
+    console.log(e);
+    axios.post('/api/v1/flights', {flight: {price: 23}})
+    .then(response => {
+      const flights = update(this.state.flights, {
+        $splice: [[0, 0, response.data]]
+      })
+      this.setState({
+        flights: flights
+      })
+    })
+    .catch(error => console.log(error))
+}
 
   isValid = () => {
-    const { errors, isValid } = validateFlightInput(this.state);
-    if (!isValid) this.setState({ errors });
-    return isValid;
+    // // const { errors, isValid } = validateFlightInput(this.state);
+    // if (!isValid) this.setState({ errors });
+    return true;
   }
 
-  onSubmit = (e) => {
-    e.preventDefault();
-
-    if (this.isValid()) {
-      this.setState({ errors: {}, isLoading: true });
-      this.storeFlightData();
-      this.props.history.push('/admin/flights');
-    }
-  }
+  // onSubmit = (e) => {
+  //   e.preventDefault();
+  //
+  //   if (this.isValid()) {
+  //     this.setState({ errors: {}, isLoading: true });
+  //     this.storeFlightData();
+  //     this.props.history.push('/admin/flights');
+  //   }
+  // }
 
   storeFlightData = () => {
     const { name, departureAirport, arrivalAirport, arrivalTime, departureTime, startDate, endDate, price } = this.state;
@@ -91,86 +93,10 @@ export default class NewFlight extends React.Component {
             <form>
               <h3 className='text-center'>New Flight</h3>
 
-              <TextField
-                error={errors.name}
-                label='Name'
-                onChange={this.onChange}
-                value={name}
-                fieldName='name'
-                type='text'
-                autoComplete='off'
-                id='flight_name'
-                autoFocus={true}
-              />
-
-              <SelectField
-                error={errors.departureAirport}
-                fieldName='departureAirport'
-                label='Departure Airport'
-                id='departure_airport'
-                onChange={this.onChange}
-                options={airportOptions}
-                prompt='-- Select Airport --'
-              />
 
               <TextField
-                error={errors.departureTime}
-                label='Departure Time'
-                onChange={this.onChange}
-                value={departureTime}
-                fieldName='departureTime'
-                type='time'
-                autoComplete='off'
-                id='flight_departure_time'
-              />
 
-              <SelectField
-                error={errors.arrivalAirport}
-                fieldName='arrivalAirport'
-                label='Arrival Airport'
-                id='arrival_airport'
-                onChange={this.onChange}
-                options={airportOptions}
-                prompt='-- Select Airport --'
-              />
-
-              <TextField
-                error={errors.arrivalTime}
-                label='Arrival Time'
-                onChange={this.onChange}
-                value={arrivalTime}
-                fieldName='arrivalTime'
-                type='time'
-                autoComplete='off'
-                id='flight_arrival_time'
-              />
-
-              <DateField
-                error={errors.startDate}
-                label='Start Date'
-                onChange={this.onChange}
-                value={startDate}
-                fieldName='startDate'
-                type='date'
-                autoComplete='off'
-                id='flight_start_date'
-              />
-
-              <DateField
-                error={errors.endDate}
-                label='End Date'
-                onChange={this.onChange}
-                value={endDate}
-                fieldName='endDate'
-                type='date'
-                autoComplete='off'
-                id='flight_end_date'
-              />
-
-              <TextField
-                error={errors.price}
                 label='Price'
-                onChange={this.onChange}
                 value={price}
                 fieldName='price'
                 type='number'
@@ -181,7 +107,7 @@ export default class NewFlight extends React.Component {
               <SubmitButton
                 value="Create Flight"
                 disabled={isLoading}
-                onClick={this.onSubmit}
+                onClick={this.createFlight}
               />
             </form>
           </div>

@@ -14,15 +14,15 @@ export default class Flight extends React.Component {
     let authenticity = localStorage.getItem('Authenticity');
     let admin = localStorage.getItem('Admin');
 
-    if (!authenticity) {
-      this.props.history.push('/signin');
-      return;
-    }
-
-    if(!admin) {
-      this.props.history.push('/');
-      return;
-    }
+    // if (!authenticity) {
+    //   this.props.history.push('/signin');
+    //   return;
+    // }
+    //
+    // if(!admin) {
+    //   this.props.history.push('/');
+    //   return;
+    // }
 
     let flights = [];
     flights = JSON.parse(localStorage.getItem('Flights') || '[]');
@@ -44,7 +44,7 @@ export default class Flight extends React.Component {
           </div>
 
           <div className='col-sm-12 col-md-6 text-md-right'>
-            <Link className='btn btn-primary' to='/admin/flights/new'>New Flight</Link>
+            <Link className='btn btn-primary' to='/flights/new'>New Flight</Link>
           </div>
         </div>
 

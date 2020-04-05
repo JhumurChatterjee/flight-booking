@@ -1,7 +1,8 @@
 import React from 'react';
 // import Navbar from './Navbar';
-import routes from './routes';
-import axios from 'axios'
+import routes from './../routes';
+import axios from 'axios';
+import update from 'immutability-helper';
 
 class App extends React.Component {
   constructor(props) {
@@ -12,7 +13,7 @@ class App extends React.Component {
   }
 
   getTodos() {
-    axios.get('/api/v1/todos')
+    axios.get('/api/v1/flights')
     .then(response => {
       this.setState({todos: response.data})
     })
