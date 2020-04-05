@@ -26,7 +26,7 @@ class FlightsController < ApiController
   private
 
   def flight_params
-    params.require(:flight).permit(:departure_time, :arrival_time, :departure_airport, :arrival_airport, :price, :start_date, :end_date)
+    params.require(:flight).permit(:name, :departure_time, :arrival_time, :departure_airport, :arrival_airport, :price, :start_date, :end_date)
   end
 
   def flight

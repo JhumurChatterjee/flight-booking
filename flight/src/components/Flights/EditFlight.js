@@ -2,6 +2,9 @@ import React from 'react';
 import TextField from '../shared/TextField';
 import SubmitButton from '../shared/SubmitButton';
 import SelectField from '../shared/SelectField';
+import axios from 'axios';
+import update from 'immutability-helper';
+
 // import validateFlightInput from '../../validators/flightValidator';
 import DateField from '../shared/DateField';
 
@@ -21,7 +24,8 @@ export default class EditFlight extends React.Component {
       flightId: null,
       errors: {},
       airportOptions: [],
-      isLoading: false
+      isLoading: false,
+      flights: [{}]
     }
   }
 
@@ -35,42 +39,57 @@ export default class EditFlight extends React.Component {
     return true;
   }
 
-  onSubmit = (e) => {
+  getFlights() {
+    axios.get('/api/v1/flights')
+    .then(response => {
+      this.setState({flights: response.data})
+    })
+    .catch(error => console.log(error))
+    console.log(this.state);
+  }
+
+  onSubmit = (e, id) => {
     e.preventDefault();
 
-    if (this.isValid()) {
-      this.setState({ errors: {}, isLoading: true });
-      this.updateFlightData();
-      this.props.history.push('/admin/flights');
-    }
+    axios.put(`/api/v1/flights/${id}`, {flight: {name: this.state.name, price: this.state.price, departure_time: this.state.departureTime, arrival_time: this.state.arrivalTime, departure_airport: this.state.departureAirport, arrival_airport: this.state.arrivalAirport, start_date: this.state.startDate, end_date: this.state.endDate}})
+    .then(response => {
+      const todoIndex = this.state.flights.findIndex(x => x.id === response.data.id)
+      const flights = update(this.state.flights, {
+        [todoIndex]: {$set: response.data}
+      })
+      this.setState({
+        flights: flights
+      })
+    })
+    .catch(error => console.log(error))
   }
 
-  updateFlightData = () => {
-    const { name, departureAirport, arrivalAirport, arrivalTime, departureTime, startDate, endDate, price, flightId } = this.state;
-    let flights = JSON.parse(localStorage.getItem('Flights') || '[]')
-    let updatableFlight = flights.find(flight => flight.id === flightId);
-
-    if (updatableFlight) {
-      updatableFlight.name = name;
-      updatableFlight.departureAirport = departureAirport;
-      updatableFlight.arrivalAirport = arrivalAirport;
-      updatableFlight.departureTime = departureTime;
-      updatableFlight.arrivalTime = arrivalTime;
-      updatableFlight.startDate = startDate;
-      updatableFlight.endDate = endDate;
-      updatableFlight.price = price;
-    }
-
-    flights = flights.map(flight => flight.id === flightId ? updatableFlight : flight);
-    localStorage.setItem('Flights', JSON.stringify(flights))
-  }
+  // updateFlightData = () => {
+  //   const { name, departureAirport, arrivalAirport, arrivalTime, departureTime, startDate, endDate, price, flightId } = this.state;
+  //   let flights = JSON.parse(localStorage.getItem('Flights') || '[]')
+  //   let updatableFlight = flights.find(flight => flight.id === flightId);
+  //
+  //   if (updatableFlight) {
+  //     updatableFlight.name = name;
+  //     updatableFlight.departureAirport = departureAirport;
+  //     updatableFlight.arrivalAirport = arrivalAirport;
+  //     updatableFlight.departureTime = departureTime;
+  //     updatableFlight.arrivalTime = arrivalTime;
+  //     updatableFlight.startDate = startDate;
+  //     updatableFlight.endDate = endDate;
+  //     updatableFlight.price = price;
+  //   }
+  //
+  //   flights = flights.map(flight => flight.id === flightId ? updatableFlight : flight);
+  //   localStorage.setItem('Flights', JSON.stringify(flights))
+  // }
 
   componentDidMount() {
+    this.getFlights()
     const locationState = this.props.location.state;
 
     if (locationState) {
-      let flights = JSON.parse(localStorage.getItem("Flights") || "[]");
-      let flight = flights.find(flight => flight.id === locationState.id);
+      let flight = this.state.flights.find(flight => flight.id === locationState.id);
 
       this.setState({
         name: flight.name,
@@ -89,11 +108,11 @@ export default class EditFlight extends React.Component {
       this.props.history.push('/admin/airports'); //please check if logged in or not
     }
 
-    const airports = JSON.parse(localStorage.getItem('Airports') || '[]');
-    const airportOptions = airports.map(airport => {
-      return { name: airport.name, value: airport.id };
-    });
-    this.setState({ airportOptions });
+    // const airports = JSON.parse(localStorage.getItem('Airports') || '[]');
+    // const airportOptions = airports.map(airport => {
+    //   return { name: airport.name, value: airport.id };
+    // });
+    // this.setState({ airportOptions });
   }
 
   render() {
@@ -107,7 +126,6 @@ export default class EditFlight extends React.Component {
               <h3 className='text-center'>Edit Flight</h3>
 
               <TextField
-                error={errors.name}
                 label='Name'
                 onChange={this.onChange}
                 value={name}
@@ -118,15 +136,14 @@ export default class EditFlight extends React.Component {
                 autoFocus={true}
               />
 
-              <SelectField
-                error={errors.departureAirport}
+              <TextField
                 fieldName='departureAirport'
                 label='Departure Airport'
-                value=''
+                value={departureAirport}
                 id='departure_airport'
                 onChange={this.onChange}
-                options={airportOptions}
-                selectedOption={departureAirport}
+                type="text"
+                autoComplete='off'
               />
 
               <TextField
@@ -140,19 +157,17 @@ export default class EditFlight extends React.Component {
                 id='flight_departure_time'
               />
 
-              <SelectField
-                error={errors.arrivalAirport}
+              <TextField
                 fieldName='arrivalAirport'
-                value=''
+                value={arrivalAirport}
                 label='Arrival Airport'
                 id='arrival_airport'
                 onChange={this.onChange}
-                options={airportOptions}
-                selectedOption={arrivalAirport}
+                type='text'
+                autoComplete='off'
               />
 
               <TextField
-                error={errors.arrivalTime}
                 label='Arrival Time'
                 onChange={this.onChange}
                 value={arrivalTime}
@@ -163,7 +178,6 @@ export default class EditFlight extends React.Component {
               />
 
               <DateField
-                error={errors.startDate}
                 label='Start Date'
                 onChange={this.onChange}
                 value={startDate}
@@ -174,7 +188,6 @@ export default class EditFlight extends React.Component {
               />
 
               <DateField
-                error={errors.endDate}
                 label='End Date'
                 onChange={this.onChange}
                 value={endDate}
@@ -185,7 +198,7 @@ export default class EditFlight extends React.Component {
               />
 
               <TextField
-                error={errors.price}
+                error={errors.prie}
                 label='Price'
                 onChange={this.onChange}
                 value={price}
@@ -198,7 +211,7 @@ export default class EditFlight extends React.Component {
               <SubmitButton
                 value="Update Flight"
                 disabled={isLoading}
-                onClick={this.onSubmit}
+                onClick={(e) => { this.onSubmit(e, this.state.flightId)}}
               />
             </form>
           </div>

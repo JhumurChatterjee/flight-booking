@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import FlightList from './FlightList';
+import axios from 'axios';
 
 export default class Flight extends React.Component {
   constructor(props){
@@ -25,8 +26,20 @@ export default class Flight extends React.Component {
     // }
 
     let flights = [];
-    flights = JSON.parse(localStorage.getItem('Flights') || '[]');
+    flights = JSON.parse(Flight.all || '[]');
     this.setState({ flights });
+  }
+
+  getFlights() {
+    axios.get('/api/v1/flights')
+    .then(response => {
+      this.setState({flights: response.data})
+    })
+    .catch(error => console.log(error))
+  }
+
+  componentDidMount() {
+    this.getFlights();
   }
 
   render() {

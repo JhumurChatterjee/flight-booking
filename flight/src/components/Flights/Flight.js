@@ -16,7 +16,7 @@ export default class Flight extends React.Component {
           <p className='card-text'><strong>Start Date: </strong>{flight.startDate}</p>
           <p className='card-text'><strong>End Date: </strong>{flight.endDate}</p>
           <p className='card-text'><strong>Price: </strong>{flight.price}</p>
-          <Link className='btn btn-primary btn-sm' to={{ pathname: `/admin/flights/edit/${flight.id}`, state: { id: flight.id }}}>Edit</Link>
+          <Link className='btn btn-primary btn-sm' to={{ pathname: `/flights/edit/${flight.id}`, state: { id: flight.id }}}>Edit</Link>
         </div>
       </div>
     );

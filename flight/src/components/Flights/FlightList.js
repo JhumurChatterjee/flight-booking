@@ -16,12 +16,6 @@ export default class FlightList extends React.Component {
     this.setState({ flights, airports });
   }
 
-  findAirportName = (id) => {
-    const { airports } = this.state;
-    const airport = airports.find(airport => airport.id.toString() === id);
-    return airport.name;
-  }
-
   render() {
     if(this.state.airports === null) return null;
 
@@ -30,7 +24,7 @@ export default class FlightList extends React.Component {
         { this.props.flights.map((flight, index) => {
           return(
             <div className='col-sm-3' key={index}>
-              <Flight flight={flight} departureAirport={this.findAirportName(flight.departureAirport)} arrivalAirport={this.findAirportName(flight.arrivalAirport)} />
+              <Flight flight={flight} />
             </div>
           )})}
       </div>
